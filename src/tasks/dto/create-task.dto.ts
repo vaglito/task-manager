@@ -12,5 +12,5 @@ export class CreateTaskDto {
   description: string;
 
   @IsBoolean()
-  done: boolean;
+  completed: boolean;
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Patch, Body, Query, Param } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
 import { TasksService } from './tasks.service';
+import { Tasks } from '@prisma/client';
 
 @Controller('/tasks')
 export class TasksController {
@@ -8,29 +8,28 @@ export class TasksController {
     constructor(private tasksServices:TasksService) {}
 
     @Get()
-    getAllTasks(@Query() query: any) {
-        console.log(query)
-        return this.tasksServices.getTasks();
+    async getAllTasks() {
+        return this.tasksServices.getAllTasks();
     }
 
-    @Get('/:id')
-    getTaskById(@Param('id') id: string) {
-        return this.tasksServices.getTaskById(parseInt(id));
+    @Get(':id')
+    async getTaskById(@Param('id') id: string) {
+        return this.tasksServices.getTaskById(id);
     }
 
     @Post('')
-    createTasks(@Body() createTaskDto: CreateTaskDto) {
-        return this.tasksServices.createTask(createTaskDto);
+    async createTasks(@Body() data: Tasks) {
+        return this.tasksServices.createTask(data);
     }
 
-    @Put()
-    updateTasks() {
-        return this.tasksServices.updateTask();
+    @Put(':id')
+    async updateTasks(@Param('id') id: string, @Body() data: Tasks) {
+        return this.tasksServices.updateTask(id, data);
     }
 
-    @Delete()
-    deleteTasks() {
-        return this.tasksServices.deleteTask();
+    @Delete('id')
+    async deleteTasks(@Param('id') id: string) {
+        return this.tasksServices.deleteTask(id);
     }
 
     @Patch()

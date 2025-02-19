@@ -1,47 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-
+import { PrismaService } from '../prisma/prisma.service';
+import { Tasks } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
-  private tasks = [];
+  constructor(private task: PrismaService) {}
 
-  getTasks(): CreateTaskDto[] {
-    return this.tasks;
+  async getAllTasks(): Promise<Tasks[]> {
+    return this.task.tasks.findMany();
   }
 
-  getTaskById(id: number) {
-    const taskfound = this.tasks.find((task) => task.id === id);
-    if (!taskfound) {
-      return new NotFoundException(`Tarea con la id ${id} no encontrada`);
-    }
-    return taskfound;
-  }
-
-  createTask(task: CreateTaskDto) {
-    this.tasks.push({
-      id: this.tasks.length + 1,
-      ...task,
+  async getTaskById(id: string): Promise<Tasks> {
+    return this.task.tasks.findUnique({
+      where: {
+        id: id,
+      },
     });
-    return {
-      message: 'Tarea creada correctamente',
-      status: 'success',
-      task,
-    };
   }
 
-  updateTask() {
-    return {
-      message: 'Actualizando una tarea',
-      status: 'success',
-    };
+  async createTask(task: Tasks): Promise<Tasks> {
+    return this.task.tasks.create({ data: task });
   }
 
-  deleteTask() {
-    return {
-      message: 'Eliminando una tarea',
-      status: '404 not found',
-    };
+  async updateTask(id: string, data: Tasks): Promise<Tasks> {
+    return this.task.tasks.update({
+      where: {
+        id: id,
+      },
+      data,
+    });
+  }
+
+  async deleteTask(id: string): Promise<Tasks> {
+    return this.task.tasks.delete({
+      where: {
+        id: id,
+      },
+    });
   }
 
   patchTask() {
